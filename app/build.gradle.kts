@@ -37,6 +37,7 @@ android {
 
 dependencies {
     val room_version = "2.6.1"
+    val ktx_version = "2.4.0"
 
     // room
     implementation("androidx.room:room-runtime:$room_version")
@@ -46,6 +47,11 @@ dependencies {
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+
+    // coroutine scopes
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$ktx_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$ktx_version")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$ktx_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
