@@ -11,18 +11,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.studentregister.databinding.ActivityMainBinding
 import com.example.studentregister.db.Student
 import com.example.studentregister.db.StudentDatabase
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var nameEditText: EditText
-    private lateinit var emailEditText: EditText
-    private lateinit var saveButton: Button
-    private lateinit var clearButton: Button
-
     private lateinit var viewModel: StudentViewModel
-    private lateinit var studentRecyclerView: RecyclerView
     private lateinit var adapter: StudentRecyclerViewAdapter
+    private lateinit var binding: ActivityMainBinding
 
     private lateinit var selectedStudent: Student
     private var isListItemClicked = false
@@ -30,53 +26,49 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-
-        nameEditText = findViewById(R.id.etName)
-        emailEditText = findViewById(R.id.etEmail)
-        saveButton = findViewById(R.id.btnSave)
-        clearButton = findViewById(R.id.btnClear)
-        studentRecyclerView = findViewById(R.id.rvStudents)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val dao = StudentDatabase.getInstance(application).studentDao()
         val factory = StudentViewModelFactory(dao)
         viewModel = ViewModelProvider(this, factory).get(StudentViewModel::class.java)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        saveButton.setOnClickListener {
-            if (isListItemClicked) {
-                updateStudent()
-                clearInput()
-            } else {
-                saveStudentData()
-                clearInput()
+        binding.apply {
+            btnSave.setOnClickListener {
+                if (isListItemClicked) {
+                    updateStudent()
+                    clearInput()
+                } else {
+                    saveStudentData()
+                    clearInput()
+                }
+
             }
 
-        }
-
-        clearButton.setOnClickListener {
-            if (isListItemClicked) {
-                deleteStudent()
-                clearInput()
-            } else {
-                clearInput()
+            btnClear.setOnClickListener {
+                if (isListItemClicked) {
+                    deleteStudent()
+                    clearInput()
+                } else {
+                    clearInput()
+                }
             }
         }
-
         initiateRecyclerView()
     }
 
     private fun initiateRecyclerView() {
-        studentRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.rvStudents.layoutManager = LinearLayoutManager(this)
         adapter = StudentRecyclerViewAdapter { student: Student ->
             clickListener(student)
         }
-        studentRecyclerView.adapter = adapter
+        binding.rvStudents.adapter = adapter
         displayStudentsList()
     }
 
@@ -88,60 +80,70 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clickListener(student: Student) {
-        selectedStudent = student
-        saveButton.setText("Update")
-        clearButton.setText("Delete")
-        isListItemClicked = true
-        nameEditText.setText(selectedStudent.name)
-        emailEditText.setText(selectedStudent.email)
+        binding.apply {
+            selectedStudent = student
+            btnSave.setText("Update")
+            btnClear.setText("Delete")
+            isListItemClicked = true
+            etName.setText(selectedStudent.name)
+            etEmail.setText(selectedStudent.email)
+        }
     }
 
     private fun updateStudent() {
-        viewModel.updateStudent(
-            Student(
-                selectedStudent.id,
-                nameEditText.text.toString(),
-                emailEditText.text.toString()
+        binding.apply {
+            viewModel.updateStudent(
+                Student(
+                    selectedStudent.id,
+                    etName.text.toString(),
+                    etEmail.text.toString()
+                )
             )
-        )
-
+        }
         resetInput()
     }
 
     private fun deleteStudent() {
-        viewModel.deleteStudent(
-            Student(
-                selectedStudent.id,
-                nameEditText.text.toString(),
-                emailEditText.text.toString()
+        binding.apply {
+            viewModel.deleteStudent(
+                Student(
+                    selectedStudent.id,
+                    etName.text.toString(),
+                    etEmail.text.toString()
+                )
             )
-        )
-
-        resetInput()
+            resetInput()
+        }
     }
 
     private fun resetInput() {
-        saveButton.setText("Save")
-        clearButton.setText("Clear")
-        isListItemClicked = false
+        binding.apply {
+            btnSave.setText("Save")
+            btnClear.setText("Clear")
+            isListItemClicked = false
+        }
     }
 
     private fun saveStudentData() {
-        val name = nameEditText.text.toString()
-        val email = emailEditText.text.toString()
-        if (!name.isNullOrEmpty() && !email.isNullOrEmpty()) {
-            viewModel.insertStudent(
-                Student(
-                    0,
-                    nameEditText.text.toString(),
-                    emailEditText.text.toString()
+        binding.apply {
+            val name = etName.text.toString()
+            val email = etEmail.text.toString()
+            if (!name.isNullOrEmpty() && !email.isNullOrEmpty()) {
+                viewModel.insertStudent(
+                    Student(
+                        0,
+                        etName.text.toString(),
+                        etEmail.text.toString()
+                    )
                 )
-            )
+            }
         }
     }
 
     private fun clearInput() {
-        nameEditText.setText("")
-        emailEditText.setText("")
+        binding.apply {
+            etName.setText("")
+            etEmail.setText("")
+        }
     }
 }
