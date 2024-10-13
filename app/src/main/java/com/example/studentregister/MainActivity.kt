@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.studentregister.db.Student
 import com.example.studentregister.db.StudentDatabase
 
@@ -18,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clearButton: Button
 
     private lateinit var viewModel: StudentViewModel
+    private lateinit var studentRecyclerView: RecyclerView
+    private lateinit var adapter: StudentRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.etEmail)
         saveButton = findViewById(R.id.btnSave)
         clearButton = findViewById(R.id.btnClear)
+        studentRecyclerView = findViewById(R.id.rvStudents)
 
         val dao = StudentDatabase.getInstance(application).studentDao()
         val factory = StudentViewModelFactory(dao)
@@ -46,6 +51,22 @@ class MainActivity : AppCompatActivity() {
 
         clearButton.setOnClickListener {
             clearInput()
+        }
+
+        initiateRecyclerView()
+    }
+
+    private fun initiateRecyclerView(){
+        studentRecyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = StudentRecyclerViewAdapter()
+        studentRecyclerView.adapter = adapter
+        displayStudentsList()
+    }
+
+    private fun displayStudentsList(){
+        viewModel.students.observe(this) {
+            adapter.setStudentsList(it)
+            adapter.notifyDataSetChanged()
         }
     }
 
