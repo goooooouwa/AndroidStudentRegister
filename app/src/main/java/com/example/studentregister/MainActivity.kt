@@ -125,18 +125,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveStudentData() {
-        binding.apply {
-            val name = etName.text.toString()
-            val email = etEmail.text.toString()
-            if (!name.isNullOrEmpty() && !email.isNullOrEmpty()) {
-                viewModel.insertStudent(
-                    Student(
-                        0,
-                        etName.text.toString(),
-                        etEmail.text.toString()
-                    )
+        val name = binding.etName.text.toString()
+        val email = binding.etEmail.text.toString()
+        if (name.isEmpty() || email.isEmpty()) {
+            Toast.makeText(
+                this,
+                "Name and email can not be empty",
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            viewModel.insertStudent(
+                Student(
+                    0,
+                    binding.etName.text.toString(),
+                    binding.etEmail.text.toString()
                 )
-            }
+            )
         }
     }
 
